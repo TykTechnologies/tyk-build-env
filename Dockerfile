@@ -1,16 +1,23 @@
-FROM debian:jessie
-
-RUN apt-get update -y -qq && apt-get install -y ca-certificates curl wget build-essential libluajit-5.1-2 libluajit-5.1-dev luarocks python3-setuptools python3-dev libpython3.4 locales ruby-dev gcc make rubygems rpm gnupg expect perl git openssh-client procps autoconf autogen libtool
-
-RUN wget -O go.tgz "https://dl.google.com/go/go1.10.3.linux-amd64.tar.gz" && tar -C /usr/local -xzf go.tgz && rm go.tgz
-RUN mkdir -p "/go/src" "/go/bin" && chmod -R 777 "/go"
-
+FROM debian:buster-slim
+RUN apt-get update && apt-get dist-upgrade -y
+RUN apt-get install -y ca-certificates git curl jq
+RUN apt-get install -y build-essential libluajit-5.1-2 luarocks python3-setuptools python3-dev python3-pip
 RUN luarocks install lua-cjson
 
-# Install fresh pip to support binary distributions
-RUN wget https://bootstrap.pypa.io/get-pip.py && python3 get-pip.py
+# Sphinx 1.5.2 breaks grpcio
+RUN pip3 install Sphinx==1.5.1
 RUN pip3 install grpcio
+RUN pip3 install protobuf
 
-RUN GOPATH=/ /usr/local/go/bin/go get github.com/mitchellh/gox
-RUN gem install fpm && gem install rake && gem install package_cloud
-RUN mkdir -p ~/rpmbuild/SOURCES ~/rpmbuild/SPECS
+# Go install
+RUN curl -sL https://dl.google.com/go/go1.12.8.linux-amd64.tar.gz | tar -xzC /usr/local/
+
+RUN mkdir -p /go/src/plugin-build
+COPY data/build.sh /build.sh
+RUN chmod +x /build.sh
+
+ENV PATH=$PATH:/usr/local/go/bin
+ENV GOPATH=/go
+
+ENTRYPOINT ["/build.sh"]
+CMD ["main", "v2.8.2"]
