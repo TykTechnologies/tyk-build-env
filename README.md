@@ -12,25 +12,15 @@ mount your code into the image.
 
 ``` shell
 cd ${GOPATH}/src/tyk-plugin
-docker run -v `pwd`:/go/src/plugin-build plugin-build plugin pre
+docker run -v `pwd`:/go/src/plugin-build plugin-build pre
 ```
 
 You will find a `pre.so` in the current directory which is the file
 that goes into the API definition
 
-## Building the main app
-
-``` shell
-cd ${GOPATH}/src/tyk-plugin
-docker run -v `pwd`:/go/src/plugin-build plugin-build
-```
-
-You will find a `build` directory in the current direcotry with the
-build artifacts.
-
 # Building the image
 
-This will build the image that will be used in the plgin build
+This will build the image that will be used in the plugin build
 step. This section is for only for informational purposes.
 
 In the root of the repo:
