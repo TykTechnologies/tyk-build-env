@@ -20,5 +20,6 @@ if [ -z "$plugin_name" ]; then
     exit 1
 fi
 
+cp -r $TYK_GW_PATH/vendor $PLUGIN_BUILD_PATH/vendor
 cd $PLUGIN_BUILD_PATH && \
     go build -buildmode=plugin -o $plugin_name
