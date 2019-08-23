@@ -22,6 +22,7 @@ fi
 
 # Handle if plugin has own vendor folder, and ignore error if not
 yes | cp -r $PLUGIN_BUILD_PATH/vendor $GOPATH/src | true
+rf -rf $PLUGIN_BUILD_PATH/vendor
 
 # Move GW vendor folder to GOPATH (same step should be made during building main binaries)
 yes | cp -r $TYK_GW_PATH/vendor $GOPATH/src
