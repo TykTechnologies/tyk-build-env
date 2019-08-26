@@ -22,4 +22,4 @@ RUN chmod +x /build.sh
 RUN curl -sL "https://api.github.com/repos/TykTechnologies/tyk/tarball/${TYK_GW_TAG}" | \
     tar -C $TYK_GW_PATH --strip-components=1 -xzf -
 
-ENTRYPOINT ["/build.sh"]
+CMD ["/build.sh"]
