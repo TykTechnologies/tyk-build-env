@@ -19,11 +19,10 @@ gateway](https://github.com/TykTechnologies/tyk/tree/master/vendor)
 then your module will be overridden by the version that Tyk uses. 
 
 ``` shell
-cd ${GOPATH}/src/tyk-plugin
-docker run -v `pwd`:/go/src/plugin-build plugin-build pre
+docker run -v `pwd`:/go/src/plugin-build tykio/tyk-plugin-compiler:v2.9.3 myplugin.so
 ```
 
-You will find a `pre.so` in the current directory which is the file
+You will find a `myplugin.so` in the current directory which is the file
 that goes into the API definition
 
 # Building the image
@@ -34,7 +33,7 @@ step. This section is for only for informational purposes.
 In the root of the repo:
 
 ``` shell
-docker build --build-arg TYK_GW_TAG=v2.8.4 -t tyk-plugin-build-2.8.4 .
+docker build --build-arg TYK_GW_TAG=v2.9.3 -t tyk-plugin-build-2.9.3 .
 ```
 
 TYK_GW_TAG refers to the _tag_ in github corresponding to a released
