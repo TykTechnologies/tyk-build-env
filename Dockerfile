@@ -1,25 +1,31 @@
-FROM debian:buster-slim
-ENV PATH=$PATH:/usr/local/go/bin
-ENV GOPATH=/go
+FROM golang:1.13
+LABEL io.tyk.vendor="Tyk" \
+      version="1.4" \
+      description="Base image for builds"
 
-ARG TYK_GW_TAG
-ENV TYK_GW_PATH=${GOPATH}/src/github.com/TykTechnologies/tyk
+ENV GOPATH=/
+ENV PACKER_VERSION="1.5.4"
 
 RUN apt-get update && apt-get dist-upgrade -y && \
-    apt-get install -y ca-certificates git curl jq build-essential libluajit-5.1-2 luarocks python3-setuptools python3-dev python3-pip
+    apt-get install -y ca-certificates \
+                       git \
+                       locales \
+                       curl \
+                       jq \
+                       rpm \
+                       dpkg-sig \
+                       build-essential \
+                       libluajit-5.1-2 \
+                       libluajit-5.1-dev \
+                       luarocks \
+                       python3-setuptools \
+                       python3-dev \
+                       python3-pip \
+                       ruby-dev 
 RUN luarocks install lua-cjson
-
-RUN pip3 install grpcio
-RUN pip3 install protobuf
-
-# Go install
-RUN curl -sL https://dl.google.com/go/go1.12.8.linux-amd64.tar.gz | tar -xzC /usr/local/
-
-RUN mkdir -p /go/src/plugin-build $TYK_GW_PATH
-COPY data/build.sh /build.sh
-RUN chmod +x /build.sh
-
-RUN curl -sL "https://api.github.com/repos/TykTechnologies/tyk/tarball/${TYK_GW_TAG}" | \
-    tar -C $TYK_GW_PATH --strip-components=1 -xzf -
-
-ENTRYPOINT ["/build.sh"]
+RUN pip3 install grpcio protobuf
+RUN mkdir -p $GOPATH ~/rpmbuild/SOURCES ~/rpmbuild/SPECS
+RUN go get github.com/mitchellh/gox 
+RUN gem install fpm rake package_cloud
+RUN curl https://releases.hashicorp.com/packer/${PACKER_VERSION}/packer_${PACKER_VERSION}_linux_amd64.zip \
+        -o /tmp/packer.zip && cd /usr/local/bin && unzip /tmp/packer.zip
