@@ -16,11 +16,12 @@ jobs:
     steps:
       - name: checkout tyk-build-env
         uses: actions/checkout@v2
-        
-      - name: push to docker hub
+
+      - name: push to github registry
         uses: docker/build-push-action@v1
         with:
-          username: alephnull
-          password: ${{ secrets.DH_PASSWORD }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+          registry: docker.pkg.github.com
           repository: tykio/tyk-build-env
           tag_with_ref: true
