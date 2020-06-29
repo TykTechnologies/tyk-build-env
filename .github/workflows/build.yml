@@ -1,0 +1,26 @@
+# Build and push a docker image 
+
+name: Integration image
+
+on:
+  push:
+    branches:
+      - gw
+      - db
+      - master
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: checkout tyk-build-env
+        uses: actions/checkout@v2
+        
+      - name: push to docker hub
+        uses: docker/build-push-action@v1
+        with:
+          username: alephnull
+          password: ${{ secrets.DH_PASSWORD }}
+          repository: tykio/tyk-build-env
+          tag_with_ref: true
