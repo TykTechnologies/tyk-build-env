@@ -13,7 +13,7 @@ RUN pip3 install grpcio
 RUN pip3 install protobuf
 
 # Go install
-RUN curl -sL https://dl.google.com/go/go1.15.5.linux-amd64.tar.gz | tar -xzC /usr/local/
+RUN curl -sL https://dl.google.com/go/go1.12.8.linux-amd64.tar.gz | tar -xzC /usr/local/
 
 RUN mkdir -p /go/src/plugin-build $TYK_GW_PATH
 COPY data/build.sh /build.sh
