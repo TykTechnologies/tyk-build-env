@@ -1,25 +1,21 @@
-FROM debian:buster-slim
-ENV PATH=$PATH:/usr/local/go/bin
+FROM golang:1.15.5
 ENV GOPATH=/go
-
-ARG TYK_GW_TAG
-ENV TYK_GW_PATH=${GOPATH}/src/github.com/TykTechnologies/tyk
+ENV PATH=${PATH}:${GOPATH}/bin
 
 RUN apt-get update && apt-get dist-upgrade -y && \
-    apt-get install -y ca-certificates git curl jq build-essential libluajit-5.1-2 luarocks python3-setuptools python3-dev python3-pip
+        apt-get install -y ca-certificates git locales curl jq rpm build-essential unzip \
+        libluajit-5.1-2 libluajit-5.1-dev luarocks \
+        python3-setuptools python3-dev python3-pip \
+        ruby-dev \
+        nodejs
+# In the github action, we need the docker cli inside the container for AWS actions
+RUN curl -fsSL https://download.docker.com/linux/debian/gpg | apt-key add - && \
+        echo "deb [arch=amd64] https://download.docker.com/linux/debian buster stable" > /etc/apt/sources.list.d/docker.list && \
+        apt-get update && apt-get install docker-ce-cli
+# RUN curl -fsSL https://releases.hashicorp.com/terraform/0.12.26/terraform_0.12.26_linux_amd64.zip -o terraform.zip && \
+#         unzip terraform.zip -d /usr/bin && rm terraform.zip
 RUN luarocks install lua-cjson
-
-RUN pip3 install grpcio
-RUN pip3 install protobuf
-
-# Go install
-RUN curl -sL https://dl.google.com/go/go1.15.5.linux-amd64.tar.gz | tar -xzC /usr/local/
-
-RUN mkdir -p /go/src/plugin-build $TYK_GW_PATH
-COPY data/build.sh /build.sh
-RUN chmod +x /build.sh
-
-RUN curl -sL "https://api.github.com/repos/TykTechnologies/tyk/tarball/${TYK_GW_TAG}" | \
-    tar -C $TYK_GW_PATH --strip-components=1 -xzf -
-
-ENTRYPOINT ["/build.sh"]
+RUN pip3 install grpcio protobuf
+RUN gem install fpm
+RUN go get github.com/mitchellh/gox
+RUN mkdir -p $GOPATH
