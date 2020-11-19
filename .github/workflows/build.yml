@@ -1,6 +1,6 @@
 # Build and push a docker image 
 
-name: Integration image
+name: Publish image
 
 on:
   push:
