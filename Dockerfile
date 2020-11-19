@@ -1,25 +1,24 @@
-FROM debian:buster-slim
-ENV PATH=$PATH:/usr/local/go/bin
+FROM golang:1.12.17
+ENV PATH=$PATH
 ENV GOPATH=/go
 
-ARG TYK_GW_TAG
-ENV TYK_GW_PATH=${GOPATH}/src/github.com/TykTechnologies/tyk
-
-RUN apt-get update && apt-get dist-upgrade -y && \
-    apt-get install -y ca-certificates git curl jq build-essential libluajit-5.1-2 luarocks python3-setuptools python3-dev python3-pip
+RUN apt-get update && apt-get dist-upgrade -y ca-certificates \
+                       git \
+                       locales \
+                       curl \
+                       jq \
+                       rpm \
+                       dpkg-sig \
+                       build-essential \
+                       libluajit-5.1-2  libluajit-5.1-dev luarocks \
+                       python3-setuptools python3-dev python3-pip \
+                       ruby-dev 
 RUN luarocks install lua-cjson
 
 RUN pip3 install grpcio
 RUN pip3 install protobuf
+RUN mkdir -p $GOPATH && go get github.com/mitchellh/gox
+RUN gem install fpm
 
-# Go install
-RUN curl -sL https://dl.google.com/go/go1.12.8.linux-amd64.tar.gz | tar -xzC /usr/local/
-
-RUN mkdir -p /go/src/plugin-build $TYK_GW_PATH
-COPY data/build.sh /build.sh
-RUN chmod +x /build.sh
-
-RUN curl -sL "https://api.github.com/repos/TykTechnologies/tyk/tarball/${TYK_GW_TAG}" | \
-    tar -C $TYK_GW_PATH --strip-components=1 -xzf -
-
-ENTRYPOINT ["/build.sh"]
+ENV PACKER_VERSION=1.6.5
+RUN curl https://releases.hashicorp.com/packer/${PACKER_VERSION}/packer_${PACKER_VERSION}_linux_amd64.zip -o /tmp/packer.zip && unzip /tmp/packer.zip -d /usr/local/bin
